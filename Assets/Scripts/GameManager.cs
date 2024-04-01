@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     public void Spin()
     // spin butonuna basýldýðýnda rastgele bir þekilde her satýr ve sütunu yeniden ayarlamaya yarar.
     {
-        //Clear lines from previous spin
+        //önceki çizgileri temizle
         foreach (GameObject l in _matchLines)
         {
             GameObject.Destroy(l);
@@ -65,6 +65,38 @@ public class GameManager : MonoBehaviour
 
     private void CheckForMatches()
     {
+        // Diagonal Matches (soldan saða)
+        for (int i = 0; i < boardHeight - 2; i++)
+        {
+            for (int j = 0; j < boardWidth - 2; j++)
+            {
+                if (_gameBoard[i, j].name == _gameBoard[i + 1, j + 1].name &&
+                    _gameBoard[i, j].name == _gameBoard[i + 2, j + 2].name)
+                {
+                    // Diagonal kazançlý line'ý görselleþtir
+                    Vector3 start = _gameBoard[i, j].transform.position + _offset;
+                    Vector3 end = _gameBoard[i + 2, j + 2].transform.position + _offset;
+                    DrawLine(start, end);
+                }
+            }
+        }
+
+        // Diagonal Matches (saðdan sola)
+        for (int i = 0; i < boardHeight - 2; i++)
+        {
+            for (int j = 2; j < boardWidth; j++)
+            {
+                if (_gameBoard[i, j].name == _gameBoard[i + 1, j - 1].name &&
+                    _gameBoard[i, j].name == _gameBoard[i + 2, j - 2].name)
+                {
+                    // Diagonal kazançlý line'ý görselleþtir
+                    Vector3 start = _gameBoard[i, j].transform.position + _offset;
+                    Vector3 end = _gameBoard[i + 2, j - 2].transform.position + _offset;
+                    DrawLine(start, end);
+                }
+            }
+        }
+
         //Vertical Matches
         for (int i = 0; i < boardWidth; i++)
         {
