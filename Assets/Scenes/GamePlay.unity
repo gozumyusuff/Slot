@@ -1845,10 +1845,10 @@ MonoBehaviour:
   boardHeight: 3
   boardWidth: 5
   colorIcons:
-  - {fileID: 767946363101206734, guid: 62a6854843899cb44a6f6f3fcc5739d7, type: 3}
-  - {fileID: 767946363101206734, guid: 588f3ab1beca7d244a86f465fabd1fd9, type: 3}
-  - {fileID: 767946363101206734, guid: 26023a6f2e8e9a744a42d389a93cb867, type: 3}
-  - {fileID: 767946363101206734, guid: 8ae3c4b83519e1b43bb114c3b441229e, type: 3}
+  - {fileID: 8480364642581380837, guid: f3346db2aa781be408da7a3b6e5a6fb7, type: 3}
+  - {fileID: 4980695243805050096, guid: e41ddec9fd52bf04591ca0945d6832d7, type: 3}
+  - {fileID: 4205105655313819085, guid: 3c8b61e4b31e1004386d52e905f722bd, type: 3}
+  - {fileID: 6672699477207844155, guid: eed4aad7d9b1ff34ebec4bb81d863f21, type: 3}
 --- !u!4 &1995292248
 Transform:
   m_ObjectHideFlags: 0
