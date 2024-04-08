@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField]
     private int boardHeight, boardWidth;
     [SerializeField]
     private GameObject[] colorIcons;
@@ -12,6 +14,10 @@ public class GameManager : MonoBehaviour
     private GameObject[,] _gameBoard;
     private Vector3 _offset = new Vector3(0, 0, -1);
     private List<GameObject> _matchLines;
+
+    [SerializeField]
+    private TextMeshProUGUI scoreText;
+    private int _score = 0;
 
     void Start()
     {
@@ -64,7 +70,7 @@ public class GameManager : MonoBehaviour
 
     private void CheckForMatches()
     {
-        // Diagonal Matches (soldan saða)
+        //Diagonal Matches (soldan saða)
         for (int i = 0; i < boardHeight - 2; i++)
         {
             for (int j = 0; j < boardWidth - 2; j++)
@@ -80,7 +86,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // Diagonal Matches (saðdan sola)
+        //Diagonal Matches (saðdan sola)
         for (int i = 0; i < boardHeight - 2; i++)
         {
             for (int j = 2; j < boardWidth; j++)
@@ -96,17 +102,36 @@ public class GameManager : MonoBehaviour
             }
         }
 
+
         //Vertical Matches
         for (int i = 0; i < boardWidth; i++)
         {
+            int matchLength = 1;
+            GameObject matchBegin = _gameBoard[0, i];
+            GameObject matchEnd = null;
             for (int j = 1; j < boardHeight; j++)
             {
-                if (_gameBoard[j, i].name != _gameBoard[j - 1, i].name)
-                    break;
-                if (j == boardHeight - 1)
+                if (_gameBoard[j, i].name == _gameBoard[j - 1, i].name)
                 {
-                    DrawLine(_gameBoard[0, i].transform.position + _offset, _gameBoard[boardHeight - 1, i].transform.position + _offset);
+                    matchLength++;
                 }
+                else
+                {
+                    if (matchLength >= 3)
+                    {
+                        matchEnd = _gameBoard[j - 1, i];
+                        _score += 10 * (matchLength - 2);
+                        DrawLine(matchBegin.transform.position + _offset, matchEnd.transform.position + _offset);
+                    }
+                    matchBegin = _gameBoard[j, i];
+                    matchLength = 1;
+                }
+            }
+            if (matchLength >= 3)
+            {
+                matchEnd = _gameBoard[boardHeight - 1, i];
+                _score += 10 * (matchLength - 2);
+                DrawLine(matchBegin.transform.position + _offset, matchEnd.transform.position + _offset);
             }
         }
 
@@ -127,6 +152,7 @@ public class GameManager : MonoBehaviour
                     if (matchLength >= 3)
                     {
                         matchEnd = _gameBoard[i, j];
+                        _score += 10 * (matchLength - 2);
                         DrawLine(matchBegin.transform.position + _offset, matchEnd.transform.position + _offset);
                     }
                     matchBegin = _gameBoard[i, j + 1];
@@ -138,6 +164,7 @@ public class GameManager : MonoBehaviour
                 matchEnd = _gameBoard[i, boardWidth - 1];
                 DrawLine(matchBegin.transform.position + _offset, matchEnd.transform.position + _offset);
             }
+            scoreText.text = _score.ToString();
         }
         //Five in a row
         List<GameObject> points = new List<GameObject>();
@@ -179,9 +206,13 @@ public class GameManager : MonoBehaviour
                 for (int a = 0; a < points.Count; a++)
                     lr.SetPosition(a, points[a].transform.position + _offset);
                 _matchLines.Add(myLine);
+
+                // Five in a row olduðunda skoru güncelle
+                _score += 10; // Örnek bir skor artýþý
             }
         }
 
+    }
         void DrawLine(Vector3 start, Vector3 end)
         {
             GameObject myLine = new GameObject();
@@ -195,7 +226,7 @@ public class GameManager : MonoBehaviour
             _matchLines.Add(myLine);
         }
     }
-}
+
 
 
 
