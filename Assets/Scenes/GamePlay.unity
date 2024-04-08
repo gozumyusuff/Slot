@@ -1097,11 +1097,11 @@ RectTransform:
   m_Father: {fileID: 906007677}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 391, y: -197}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -147, y: 143}
   m_SizeDelta: {x: 160, y: 30}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &973032237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1847,11 +1847,11 @@ RectTransform:
   m_Father: {fileID: 906007677}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -441, y: 29}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 165, y: 0}
   m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1844661848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1980,14 +1980,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccc97dd0fe4d96b43b3a766ca1a2941c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreManager: {fileID: 2050846618}
   boardHeight: 3
   boardWidth: 5
-  colorIcons:
+  fruitTypeObjects:
   - {fileID: 8480364642581380837, guid: f3346db2aa781be408da7a3b6e5a6fb7, type: 3}
   - {fileID: 4980695243805050096, guid: e41ddec9fd52bf04591ca0945d6832d7, type: 3}
-  - {fileID: 4205105655313819085, guid: 3c8b61e4b31e1004386d52e905f722bd, type: 3}
   - {fileID: 6672699477207844155, guid: eed4aad7d9b1ff34ebec4bb81d863f21, type: 3}
-  scoreText: {fileID: 1844661848}
+  - {fileID: 4205105655313819085, guid: 3c8b61e4b31e1004386d52e905f722bd, type: 3}
 --- !u!4 &1995292248
 Transform:
   m_ObjectHideFlags: 0
@@ -2003,6 +2003,51 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2050846616
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2050846617}
+  - component: {fileID: 2050846618}
+  m_Layer: 0
+  m_Name: ScoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2050846617
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050846616}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 662.4521, y: 387.8961, z: -4.6157}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2050846618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050846616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eec9e92b91df9af438a0a1f69612b930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreText: {fileID: 1844661848}
 --- !u!1 &2092573370
 GameObject:
   m_ObjectHideFlags: 0

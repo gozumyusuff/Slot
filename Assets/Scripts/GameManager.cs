@@ -1,178 +1,91 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] ScoreManager scoreManager;
+
     [SerializeField]
     private int boardHeight, boardWidth;
     [SerializeField]
-    private GameObject[] colorIcons;
+    private GameObject[] fruitTypeObjects;
+    
+    private GameObject board;
+    private GameObject[,] gameBoard;
+    private Vector3 offset = new(0, 0, -1);
+    private List<GameObject> matchLines;
 
-    private GameObject _board;
-    private GameObject[,] _gameBoard;
-    private Vector3 _offset = new Vector3(0, 0, -1);
-    private List<GameObject> _matchLines;
-
-    [SerializeField]
-    private TextMeshProUGUI scoreText;
-    private int _score = 0;
+    private void Awake()
+    {
+        board = GameObject.Find("3x5Gameboard"); //TODO: yanlýþ eriþme
+        gameBoard = new GameObject[boardHeight, boardWidth];
+        matchLines = new List<GameObject>();        
+    }
 
     void Start()
     {
-        // oyun baþladýðýnda rastgele dizilme.
-        _board = GameObject.Find("3x5Gameboard");
-        _gameBoard = new GameObject[boardHeight, boardWidth];
-        _matchLines = new List<GameObject>();
-        for (int i = 0; i < boardHeight; i++)
-        {
-            for (int j = 0; j < boardWidth; j++)
-            {
-                GameObject gridPosition = _board.transform.Find(i + " " + j).gameObject;
-                GameObject pieceType = colorIcons[Random.Range(0, colorIcons.Length)];
-                GameObject thisPiece = Instantiate(pieceType, gridPosition.transform.position + _offset, Quaternion.identity);
-                thisPiece.name = pieceType.name;
-                thisPiece.transform.parent = gridPosition.transform;
-                _gameBoard[i, j] = thisPiece;
-            }
-        }
+        CreateBoard();
+        CheckForMatches();        
     }
 
     public void Spin()
-    // spin butonuna basýldýðýnda rastgele bir þekilde her satýr ve sütunu yeniden ayarlamaya yarar.
     {
-        //önceki çizgileri temizle
-        foreach (GameObject l in _matchLines)
+        ClearBoard();
+        CreateBoard();
+        CheckForMatches();
+
+    }
+
+    private void ClearBoard()
+    {
+        foreach (GameObject l in matchLines)
         {
             GameObject.Destroy(l);
         }
-        _matchLines.Clear();
+        matchLines.Clear();
+    }
+
+    private void CreateBoard()
+    {
         for (int i = 0; i < boardHeight; i++)
         {
             for (int j = 0; j < boardWidth; j++)
             {
-                GameObject gridPosition = _board.transform.Find(i + " " + j).gameObject;
+                GameObject gridPosition = board.transform.Find(i + " " + j).gameObject;
                 if (gridPosition.transform.childCount > 0)
                 {
                     GameObject destroyPiece = gridPosition.transform.GetChild(0).gameObject;
                     Destroy(destroyPiece);
                 }
-                GameObject pieceType = colorIcons[Random.Range(0, colorIcons.Length)];
-                GameObject thisPiece = Instantiate(pieceType, gridPosition.transform.position + _offset, Quaternion.identity);
+                GameObject pieceType = fruitTypeObjects[Random.Range(0, fruitTypeObjects.Length)];
+                GameObject thisPiece = Instantiate(pieceType, gridPosition.transform.position + offset, Quaternion.identity);
+                
                 thisPiece.name = pieceType.name;
                 thisPiece.transform.parent = gridPosition.transform;
-                _gameBoard[i, j] = thisPiece;
+                gameBoard[i, j] = thisPiece;
             }
         }
-        CheckForMatches();
     }
 
     private void CheckForMatches()
     {
-        //Diagonal Matches (soldan saða)
-        for (int i = 0; i < boardHeight - 2; i++)
-        {
-            for (int j = 0; j < boardWidth - 2; j++)
-            {
-                if (_gameBoard[i, j].name == _gameBoard[i + 1, j + 1].name &&
-                    _gameBoard[i, j].name == _gameBoard[i + 2, j + 2].name)
-                {
-                    // Diagonal kazançlý line'ý görselleþtir
-                    Vector3 start = _gameBoard[i, j].transform.position + _offset;
-                    Vector3 end = _gameBoard[i + 2, j + 2].transform.position + _offset;
-                    DrawLine(start, end);
-                }
-            }
-        }
+        DiagonalCheck();
+        VerticalCheck();
+        HorizontalCheck();
+        FiveInARowCheck();
 
-        //Diagonal Matches (saðdan sola)
-        for (int i = 0; i < boardHeight - 2; i++)
-        {
-            for (int j = 2; j < boardWidth; j++)
-            {
-                if (_gameBoard[i, j].name == _gameBoard[i + 1, j - 1].name &&
-                    _gameBoard[i, j].name == _gameBoard[i + 2, j - 2].name)
-                {
-                    // Diagonal kazançlý line'ý görselleþtir
-                    Vector3 start = _gameBoard[i, j].transform.position + _offset;
-                    Vector3 end = _gameBoard[i + 2, j - 2].transform.position + _offset;
-                    DrawLine(start, end);
-                }
-            }
-        }
+    }
 
-
-        //Vertical Matches
-        for (int i = 0; i < boardWidth; i++)
-        {
-            int matchLength = 1;
-            GameObject matchBegin = _gameBoard[0, i];
-            GameObject matchEnd = null;
-            for (int j = 1; j < boardHeight; j++)
-            {
-                if (_gameBoard[j, i].name == _gameBoard[j - 1, i].name)
-                {
-                    matchLength++;
-                }
-                else
-                {
-                    if (matchLength >= 3)
-                    {
-                        matchEnd = _gameBoard[j - 1, i];
-                        _score += 10 * (matchLength - 2);
-                        DrawLine(matchBegin.transform.position + _offset, matchEnd.transform.position + _offset);
-                    }
-                    matchBegin = _gameBoard[j, i];
-                    matchLength = 1;
-                }
-            }
-            if (matchLength >= 3)
-            {
-                matchEnd = _gameBoard[boardHeight - 1, i];
-                _score += 10 * (matchLength - 2);
-                DrawLine(matchBegin.transform.position + _offset, matchEnd.transform.position + _offset);
-            }
-        }
-
-        //Horizontal Matches
-        for (int i = 0; i < boardHeight; i++)
-        {
-            int matchLength = 1;
-            GameObject matchBegin = _gameBoard[i, 0];
-            GameObject matchEnd = null;
-            for (int j = 0; j < boardWidth - 1; j++)
-            {
-                if (_gameBoard[i, j].name == _gameBoard[i, j + 1].name)
-                {
-                    matchLength++;
-                }
-                else
-                {
-                    if (matchLength >= 3)
-                    {
-                        matchEnd = _gameBoard[i, j];
-                        _score += 10 * (matchLength - 2);
-                        DrawLine(matchBegin.transform.position + _offset, matchEnd.transform.position + _offset);
-                    }
-                    matchBegin = _gameBoard[i, j + 1];
-                    matchLength = 1;
-                }
-            }
-            if (matchLength >= 3)
-            {
-                matchEnd = _gameBoard[i, boardWidth - 1];
-                DrawLine(matchBegin.transform.position + _offset, matchEnd.transform.position + _offset);
-            }
-            scoreText.text = _score.ToString();
-        }
+    private void FiveInARowCheck()
+    {
         //Five in a row
         List<GameObject> points = new List<GameObject>();
         List<string> names = new List<string>();
         for (int i = 0; i < boardHeight; i++)
         {
             points.Clear();
-            GameObject startPoint = _gameBoard[i, 0];
+            GameObject startPoint = gameBoard[i, 0];
             if (names.Contains(startPoint.name))
                 continue;
             else
@@ -183,9 +96,9 @@ public class GameManager : MonoBehaviour
                 bool notFound = false;
                 for (int k = 0; k < boardHeight; k++)
                 {
-                    if (startPoint.name == _gameBoard[k, j].name)
+                    if (startPoint.name == gameBoard[k, j].name)
                     {
-                        points.Add(_gameBoard[k, j]);
+                        points.Add(gameBoard[k, j]);
                         break;
                     }
                     if (k == boardHeight - 1)
@@ -197,35 +110,146 @@ public class GameManager : MonoBehaviour
             if (points.Count == boardWidth)
             {
                 GameObject myLine = new GameObject();
-                myLine.transform.position = startPoint.transform.position + _offset;
+                myLine.transform.position = startPoint.transform.position + offset;
                 myLine.AddComponent<LineRenderer>();
                 LineRenderer lr = myLine.GetComponent<LineRenderer>();
                 lr.positionCount = boardWidth;
                 lr.startWidth = .1f;
                 lr.endWidth = .1f;
                 for (int a = 0; a < points.Count; a++)
-                    lr.SetPosition(a, points[a].transform.position + _offset);
-                _matchLines.Add(myLine);
+                    lr.SetPosition(a, points[a].transform.position + offset);
+                matchLines.Add(myLine);
 
                 // Five in a row olduðunda skoru güncelle
-                _score += 10; // Örnek bir skor artýþý
+                scoreManager.AddScore();
+
+            }
+        }
+    }
+
+    private void HorizontalCheck()
+    {
+        //Horizontal Matches
+        for (int i = 0; i < boardHeight; i++)
+        {
+            int matchLength = 1;
+            GameObject matchBegin = gameBoard[i, 0];
+            GameObject matchEnd = null;
+            for (int j = 0; j < boardWidth - 1; j++)
+            {
+                if (gameBoard[i, j].name == gameBoard[i, j + 1].name)
+                {
+                    matchLength++;
+                }
+                else
+                {
+                    if (matchLength >= 3)
+                    {
+                        matchEnd = gameBoard[i, j];
+                        scoreManager.AddScore(matchLength);
+                        DrawLine(matchBegin.transform.position + offset, matchEnd.transform.position + offset);
+                    }
+                    matchBegin = gameBoard[i, j + 1];
+                    matchLength = 1;
+                }
+            }
+            if (matchLength >= 3)
+            {
+                matchEnd = gameBoard[i, boardWidth - 1];
+                scoreManager.AddScore(matchLength);
+                DrawLine(matchBegin.transform.position + offset, matchEnd.transform.position + offset);
+            }
+        }
+    }
+
+    private void VerticalCheck()
+    {
+        //Vertical Matches
+        for (int i = 0; i < boardWidth; i++)
+        {
+            int matchLength = 1;
+            GameObject matchBegin = gameBoard[0, i];
+            GameObject matchEnd = null;
+            for (int j = 1; j < boardHeight; j++)
+            {
+                if (gameBoard[j, i].name == gameBoard[j - 1, i].name)
+                {
+                    matchLength++;
+                }
+                else
+                {
+                    if (matchLength >= 3)
+                    {
+                        matchEnd = gameBoard[j - 1, i];
+                        scoreManager.AddScore(10 * (matchLength - 2));
+                        DrawLine(matchBegin.transform.position + offset, matchEnd.transform.position + offset);
+                    }
+                    matchBegin = gameBoard[j, i];
+                    matchLength = 1;
+                }
+            }
+            if (matchLength >= 3)
+            {
+                matchEnd = gameBoard[boardHeight - 1, i];
+                scoreManager.AddScore(matchLength);
+                DrawLine(matchBegin.transform.position + offset, matchEnd.transform.position + offset);
+            }
+        }
+    }
+
+    private void DiagonalCheck()
+    {
+        //Diagonal Matches (soldan saða)
+        for (int i = 0; i < boardHeight - 2; i++)
+        {
+            for (int j = 0; j < boardWidth - 2; j++)
+            {
+                if (gameBoard[i, j].name == gameBoard[i + 1, j + 1].name &&
+                    gameBoard[i, j].name == gameBoard[i + 2, j + 2].name)
+                {
+                    // Diagonal kazançlý line'ý görselleþtir
+                    Vector3 start = gameBoard[i, j].transform.position + offset;
+                    Vector3 end = gameBoard[i + 2, j + 2].transform.position + offset;
+                    DrawLine(start, end);
+                    scoreManager.AddScore();
+
+                }
             }
         }
 
-    }
-        void DrawLine(Vector3 start, Vector3 end)
+        //Diagonal Matches (saðdan sola)
+        for (int i = 0; i < boardHeight - 2; i++)
         {
-            GameObject myLine = new GameObject();
-            myLine.transform.position = start;
-            myLine.AddComponent<LineRenderer>();
-            LineRenderer lr = myLine.GetComponent<LineRenderer>();
-            lr.startWidth = .1f;
-            lr.endWidth = .1f;
-            lr.SetPosition(0, start);
-            lr.SetPosition(1, end);
-            _matchLines.Add(myLine);
+            for (int j = 2; j < boardWidth; j++)
+            {
+                if (gameBoard[i, j].name == gameBoard[i + 1, j - 1].name &&
+                    gameBoard[i, j].name == gameBoard[i + 2, j - 2].name)
+                {
+                    // Diagonal kazançlý line'ý görselleþtir
+                    Vector3 start = gameBoard[i, j].transform.position + offset;
+                    Vector3 end = gameBoard[i + 2, j - 2].transform.position + offset;
+                    DrawLine(start, end);
+                    scoreManager.AddScore();
+
+
+                }
+            }
         }
     }
+
+    void DrawLine(Vector3 start, Vector3 end)
+    {
+        GameObject myLine = new GameObject();
+        myLine.transform.position = start;
+        myLine.AddComponent<LineRenderer>();
+        LineRenderer lr = myLine.GetComponent<LineRenderer>();
+        lr.startWidth = .1f;
+        lr.endWidth = .1f;
+        lr.SetPosition(0, start);
+        lr.SetPosition(1, end);
+        matchLines.Add(myLine);
+    }
+}
 
 
 
