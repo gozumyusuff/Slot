@@ -10,15 +10,15 @@ public class GameManager : MonoBehaviour
     private int boardHeight, boardWidth;
     [SerializeField]
     private GameObject[] fruitTypeObjects;
-    
-    private GameObject board;
+
+
+    [SerializeField] private GameObject board;
     private GameObject[,] gameBoard;
     private Vector3 offset = new(0, 0, -1);
     private List<GameObject> matchLines;
 
     private void Awake()
     {
-        board = GameObject.Find("3x5Gameboard"); //TODO: yanlýþ eriþme
         gameBoard = new GameObject[boardHeight, boardWidth];
         matchLines = new List<GameObject>();        
     }
